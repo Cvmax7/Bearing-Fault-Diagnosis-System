@@ -26,40 +26,34 @@
 
 ## 安装和配置
 环境要求：
+-Python 3.7+
+-PyTorch 1.7+
+-Node.js 12+ (前端开发)
+-MQTT代理 (如Mosquitto，用于数据传输)
 
-- Python 3.7+
-- PyTorch 1.7+
-- Node.js 12+ (前端开发)
-- MQTT代理 (如Mosquitto，用于数据传输)
+## 安装依赖
 
-# 安装依赖
-
-## 克隆仓库
-
+# 克隆仓库
 git clone https://github.com/yourusername/bearing-fault-detection.git
 cd bearing-fault-detection
 
-## 安装Python依赖
-
+# 安装Python依赖
 pip install -r requirements.txt
 
-## 安装前端依赖
-
+# 安装前端依赖
 cd frontend
 npm install
 
-# 使用指南
 
+# 使用指南
 ## 数据准备
 系统支持两种数据来源：
-
-- CWRU轴承数据集: 程序会自动下载和处理
-- 模拟数据: 系统自动生成用于测试
+CWRU轴承数据集: 程序会自动下载和处理
+模拟数据: 系统自动生成用于测试
 
 # 模型训练
 
 ## 使用CWRU数据训练CNN-LSTM混合模型
-
 python main.py --mode train --model cnn_lstm --data_type cwru
 
 ## 使用模拟数据训练所有模型
@@ -94,43 +88,36 @@ npm run serve
 
 ## 访问 http://localhost:8080 查看Web界面
 
-# 系统组件详解
 
-数据处理模块 (data_processing.py)
-
-- 下载和处理CWRU轴承数据集
-- 生成模拟PHM数据
-- 提取时域特征和频域特征
-- 数据分割和预处理
-
-信号处理模块 (signal_processing.py)
-
-- FFT频谱分析
-- 包络谱分析
-- 小波变换
-- 时域和频域特征提取
-- 信号滤波
-- 可视化功能
-
-模型训练模块 (enhanced_model_training.py)
+系统组件详解
+1. 数据处理模块 (data_processing.py)
+-下载和处理CWRU轴承数据集
+-生成模拟PHM数据
+-提取时域特征和频域特征
+-数据分割和预处理
+2. 信号处理模块 (signal_processing.py)
+-FFT频谱分析
+-包络谱分析
+-小波变换
+-时域和频域特征提取
+-信号滤波
+-可视化功能
+3. 模型训练模块 (enhanced_model_training.py)
 -支持CNN、LSTM、CNN-LSTM、RNN等多种模型
 -高级训练策略
 -模型评估与比较
 -模型保存与加载
 ONNX导出支持
-
-数据采集/模拟模块 (data_collection.py / data_simulator.py)
+4. 数据采集/模拟模块 (data_collection.py / data_simulator.py)
 -串口通信读取传感器数据
 -MQTT消息发布与订阅
 -模拟不同类型的轴承故障信号
-
-后端服务 (app.py)
+5. 后端服务 (app.py)
 -RESTful API
 -WebSocket实时通信
 -数据持久化
 故障诊断服务
-
-前端界面 (src/App.vue)
+6. 前端界面 (src/App.vue)
 -实时数据展示
 -故障诊断结果可视化
 -历史数据查询
@@ -163,4 +150,4 @@ bearing-fault-detection/
     │   └── ...
     └── ...
 
-​    
+    

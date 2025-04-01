@@ -65,7 +65,7 @@ class BearingFaultDetector(nn.Module):
         
         return x
 
-# 纯CNN模型
+# CNN模型
 class CNNModel(nn.Module):
     def __init__(self, input_size=1, seq_length=1024, num_classes=4):
         super(CNNModel, self).__init__()
@@ -74,16 +74,16 @@ class CNNModel(nn.Module):
         self.conv1 = nn.Conv1d(in_channels=input_size, out_channels=16, kernel_size=3, stride=1, padding=1)
         self.conv2 = nn.Conv1d(in_channels=16, out_channels=32, kernel_size=3, stride=1, padding=1)
         self.conv3 = nn.Conv1d(in_channels=32, out_channels=64, kernel_size=3, stride=1, padding=1)
-        self.conv4 = nn.Conv1d(in_channels=64, out_channels=128, kernel_size=3, stride=1, padding=1)
         
         # 池化层
         self.pool = nn.MaxPool1d(kernel_size=2, stride=2)
         
+        # 计算全连接层输入大小
+        conv_output_size = seq_length // 8 * 64  # 经过3次池化，长度变为原来的1/8
+        
         # 全连接层
-        self.fc_input_size = 128 * (seq_length // 16)  # 经过4次池化
-        self.fc1 = nn.Linear(self.fc_input_size, 100)
-        self.fc2 = nn.Linear(100, 50)
-        self.fc3 = nn.Linear(50, num_classes)
+        self.fc1 = nn.Linear(conv_output_size, 100)
+        self.fc2 = nn.Linear(100, num_classes)
         
         # Dropout和激活函数
         self.dropout = nn.Dropout(0.3)
@@ -97,8 +97,6 @@ class CNNModel(nn.Module):
         x = self.pool(x)
         x = self.relu(self.conv3(x))
         x = self.pool(x)
-        x = self.relu(self.conv4(x))
-        x = self.pool(x)
         
         # 展平
         x = x.view(x.size(0), -1)
@@ -106,13 +104,11 @@ class CNNModel(nn.Module):
         # 全连接层
         x = self.relu(self.fc1(x))
         x = self.dropout(x)
-        x = self.relu(self.fc2(x))
-        x = self.dropout(x)
-        x = self.fc3(x)
+        x = self.fc2(x)
         
         return x
 
-# 基于RNN的模型
+# RNN模型
 class RNNModel(nn.Module):
     def __init__(self, input_size=1, hidden_size=64, num_layers=2, num_classes=4):
         super(RNNModel, self).__init__()
@@ -121,26 +117,24 @@ class RNNModel(nn.Module):
         self.num_layers = num_layers
         
         # RNN层
-        self.rnn = nn.GRU(input_size, hidden_size, num_layers, batch_first=True, bidirectional=True)
+        self.rnn = nn.RNN(input_size, hidden_size, num_layers, batch_first=True)
         
         # 全连接层
-        self.fc = nn.Linear(hidden_size * 2, num_classes)  # 双向RNN，所以是hidden_size*2
-        
-        # Dropout
-        self.dropout = nn.Dropout(0.3)
+        self.fc = nn.Linear(hidden_size, num_classes)
         
     def forward(self, x):
-        # 调整输入形状 [batch_size, seq_length, input_size]
-        x = x.permute(0, 2, 1)
+        # x形状: [batch_size, input_size, seq_length]
+        # 调整输入形状以适应RNN
+        x = x.permute(0, 2, 1)  # [batch_size, seq_length, input_size]
         
         # 初始化隐藏状态
-        h0 = torch.zeros(self.num_layers * 2, x.size(0), self.hidden_size).to(x.device)
+        h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(x.device)
         
         # RNN前向传播
         out, _ = self.rnn(x, h0)
         
         # 取最后一个时间步的输出
-        out = self.dropout(out[:, -1, :])
+        out = out[:, -1, :]
         
         # 全连接层
         out = self.fc(out)

@@ -197,90 +197,75 @@ def train_models(datasets, args):
 
 def compare_models_performance(results):
     """比较不同模型的性能"""
-    print("\n=== 模型性能比较 ===")
+    model_names = list(results.keys())
+    metrics = ["accuracy", "precision", "recall", "f1"]
 
-    # 提取准确率、精确率、召回率和F1分数
-    model_names = []
-    accuracies = []
-    precisions = []
-    recalls = []
-    f1_scores = []
+    # 准备数据
+    data = {
+        metric: [results[model][metric] for model in model_names] for metric in metrics
+    }
 
-    for model_name, metrics in results.items():
-        model_names.append(model_name)
-        accuracies.append(metrics["accuracy"])
-        precisions.append(metrics["precision"])
-        recalls.append(metrics["recall"])
-        f1_scores.append(metrics["f1"])
-
-    # 绘制比较图
+    # 绘制柱状图
     plt.figure(figsize=(12, 8))
-
     x = np.arange(len(model_names))
     width = 0.2
 
-    plt.bar(x - 1.5 * width, accuracies, width, label="准确率")
-    plt.bar(x - 0.5 * width, precisions, width, label="精确率")
-    plt.bar(x + 0.5 * width, recalls, width, label="召回率")
-    plt.bar(x + 1.5 * width, f1_scores, width, label="F1分数")
+    for i, metric in enumerate(metrics):
+        plt.bar(x + i * width, data[metric], width=width, label=metric)
 
     plt.xlabel("模型")
-    plt.ylabel("分数")
-    plt.title("不同模型性能比较")
-    plt.xticks(x, model_names, rotation=45, ha="right")
+    plt.ylabel("指标值")
+    plt.title("模型性能比较")
+    plt.xticks(x + width * 1.5, model_names)
     plt.legend()
+    plt.grid(True, axis="y")
     plt.tight_layout()
     plt.savefig("results/model_comparison.png")
     plt.show()
 
+    # 打印结果表格
+    print("\n模型性能比较表：")
+    print("-" * 80)
+    print(f"{'模型':<20} {'准确率':<10} {'精确率':<10} {'召回率':<10} {'F1分数':<10}")
+    print("-" * 80)
+    for model in model_names:
+        print(
+            f"{model:<20} {results[model]['accuracy']:<10.4f} {results[model]['precision']:<10.4f} {results[model]['recall']:<10.4f} {results[model]['f1']:<10.4f}"
+        )
+    print("-" * 80)
 
-def visualize_samples(X, y, num_samples=5, title="数据样本可视化"):
-    """可视化数据样本"""
-    print(f"\n=== {title} ===")
 
-    # 创建信号处理器
-    processor = SignalProcessor()
+def visualize_samples(X, y, num_samples=5, title="数据样本"):
+    """可视化一些样本"""
+    # 确保样本数不超过总样本数
+    num_samples = min(num_samples, len(X))
 
-    # 为每个类别选择样本
-    labels = np.unique(y)
+    # 获取唯一的类别
+    unique_labels = np.unique(y)
 
     plt.figure(figsize=(15, 10))
-    for i, label in enumerate(labels):
-        # 获取当前类别的索引
-        indices = np.where(y == label)[0]
+    for i, label in enumerate(unique_labels):
+        # 找到属于该类别的样本
+        idx = np.where(y == label)[0]
+        if len(idx) == 0:
+            continue
 
-        # 随机选择样本
-        if len(indices) > num_samples:
-            indices = np.random.choice(indices, num_samples, replace=False)
+        # 选择一个样本
+        sample_idx = idx[0]
 
         # 绘制样本
-        for j, idx in enumerate(indices):
-            plt.subplot(len(labels), num_samples, i * num_samples + j + 1)
-            plt.plot(X[idx])
-            plt.title(f"类别 {label} - 样本 {j+1}")
-            plt.xticks([])
+        plt.subplot(len(unique_labels), 1, i + 1)
+        if len(X.shape) == 3:  # 如果数据是3D的
+            plt.plot(X[sample_idx, 0, :])
+        else:  # 如果数据是2D的
+            plt.plot(X[sample_idx])
 
+        plt.title(f"类别 {label}")
+        plt.grid(True)
+
+    plt.suptitle(title)
     plt.tight_layout()
-    plt.savefig(f"results/{title.replace(' ', '_')}.png")
-    plt.show()
-
-    # 也为第一个样本绘制频谱
-    plt.figure(figsize=(12, 8))
-    for i, label in enumerate(labels):
-        indices = np.where(y == label)[0]
-        if len(indices) > 0:
-            idx = indices[0]
-            plt.subplot(len(labels), 2, 2 * i + 1)
-            plt.plot(X[idx])
-            plt.title(f"类别 {label} - 时域波形")
-
-            plt.subplot(len(labels), 2, 2 * i + 2)
-            freq, amp = processor.compute_fft(X[idx])
-            plt.plot(freq, amp)
-            plt.title(f"类别 {label} - 频域谱")
-
-    plt.tight_layout()
-    plt.savefig(f"results/{title.replace(' ', '_')}_spectra.png")
+    plt.savefig(f"results/sample_visualization.png")
     plt.show()
 
 
