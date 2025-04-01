@@ -1,0 +1,33 @@
+# 核心依赖
+streamlit>=1.22.0
+pandas>=1.5.3
+numpy>=1.23.5
+fastapi>=0.95.1
+uvicorn>=0.22.0
+requests>=2.28.2
+
+# 数据可视化
+plotly>=5.14.1
+altair>=4.2.2
+matplotlib>=3.7.1
+
+# MQTT通信
+paho-mqtt>=2.1.1
+
+# 数据库
+sqlalchemy>=2.0.12
+
+# 机器学习/深度学习
+scikit-learn>=1.2.2
+torch>=2.0.0
+
+# API文档
+pydantic>=1.10.7
+
+# 实用工具
+python-dotenv>=1.0.0
+tqdm>=4.65.0
+
+# 额外依赖 (可选)
+streamlit-autorefresh>=0.0.3  # 用于自动刷新功能
+jupyter>=1.0.0                # 用于开发和实验
