@@ -33,102 +33,173 @@
 
 ## 安装依赖
 
-# 克隆仓库
-git clone https://github.com/yourusername/bearing-fault-detection.git
+### 克隆仓库
+
+```
+git clone git@github.com:Cvmax7/csjs.git
 cd bearing-fault-detection
+```
 
-# 安装Python依赖
+
+
+### 安装Python依赖
+
+```
 pip install -r requirements.txt
+```
 
-# 安装前端依赖
+
+
+### 安装前端依赖
+
+```
 cd frontend
 npm install
+```
 
+## 使用指南
 
-# 使用指南
-## 数据准备
+### 数据准备
+
 系统支持两种数据来源：
-CWRU轴承数据集: 程序会自动下载和处理
-模拟数据: 系统自动生成用于测试
 
-# 模型训练
+- CWRU轴承数据集: 程序会自动下载和处理
+- 模拟数据: 系统自动生成用于测试
 
-## 使用CWRU数据训练CNN-LSTM混合模型
+### 模型训练
+
+1. 使用CWRU数据训练CNN-LSTM混合模型
+
+```bash
 python main.py --mode train --model cnn_lstm --data_type cwru
+```
 
-## 使用模拟数据训练所有模型
+​    2. 使用模拟数据训练所有模型
+
+```bash
 python main.py --mode train --model all --data_type simulated
+```
 
-## 使用原始波形而非提取特征进行训练
+3. 使用原始波形而非提取特征进行训练
+
+```bash
 python main.py --mode train --model cnn_lstm --data_type both --extract_features
+```
 
+## 模型评估
 
-# 模型评估
+1. 评估已训练模型在CWRU数据上的性能
 
-## 评估已训练模型在CWRU数据上的性能
+```bash
 python main.py --mode evaluate --data_type cwru
+```
 
-## 比较不同模型在模拟数据上的性能
+2. 比较不同模型在模拟数据上的性能
+
+```bash
 python main.py --mode evaluate --data_type simulated
+```
 
-# 实时仿真与监测
-## 使用训练好的模型进行实时故障检测模拟
+## 实时仿真与监测
+
+1. 使用训练好的模型进行实时故障检测模拟
+
+```bash
 python main.py --mode simulate --model cnn_lstm
+```
 
-## 运行完整工作流程(训练、评估、模拟)
+2. 运行完整工作流程(训练、评估、模拟)
+
+```bash
 python main.py --mode all --model cnn_lstm --data_type both
+```
 
-# 启动Web界面
-## 启动后端服务
+## 启动Web界面
+
+1. 启动后端服务
+
+```
 python app.py
+```
 
-## 启动前端开发服务器
+2. 启动前端开发服务器
+
+```
 cd frontend
 npm run serve
+```
 
-## 访问 http://localhost:8080 查看Web界面
+3. 访问 http://localhost:8080 查看Web界面
 
+## 系统组件详解
 
-系统组件详解
 1. 数据处理模块 (data_processing.py)
--下载和处理CWRU轴承数据集
--生成模拟PHM数据
--提取时域特征和频域特征
--数据分割和预处理
+
+  -下载和处理CWRU轴承数据集
+
+  -生成模拟PHM数据
+
+  -提取时域特征和频域特征
+
+  -数据分割和预处理
+
 2. 信号处理模块 (signal_processing.py)
--FFT频谱分析
--包络谱分析
--小波变换
--时域和频域特征提取
--信号滤波
--可视化功能
+
+  -FFT频谱分析
+
+  -包络谱分析
+
+  -小波变换
+
+  -时域和频域特征提取
+
+  -信号滤波
+
+  -可视化功能
+
 3. 模型训练模块 (enhanced_model_training.py)
--支持CNN、LSTM、CNN-LSTM、RNN等多种模型
--高级训练策略
--模型评估与比较
--模型保存与加载
-ONNX导出支持
+
+  -支持CNN、LSTM、CNN-LSTM、RNN等多种模型
+
+  -高级训练策略
+
+  -模型评估与比较
+
+  -模型保存与加载
+
+  ONNX导出支持
+
 4. 数据采集/模拟模块 (data_collection.py / data_simulator.py)
--串口通信读取传感器数据
--MQTT消息发布与订阅
--模拟不同类型的轴承故障信号
+
+  -串口通信读取传感器数据
+
+  -MQTT消息发布与订阅
+
+  -模拟不同类型的轴承故障信号
+
 5. 后端服务 (app.py)
--RESTful API
--WebSocket实时通信
--数据持久化
-故障诊断服务
-6. 前端界面 (src/App.vue)
--实时数据展示
--故障诊断结果可视化
--历史数据查询
--设备参数控制
 
+  -RESTful API
 
+  -WebSocket实时通信
 
+  -数据持久化
 
+6. 故障诊断服务
 
-# 项目结构
+7. 前端界面 (src/App.vue)
 
+  -实时数据展示
+
+  -故障诊断结果可视化
+
+  -历史数据查询
+
+  -设备参数控制
+
+## 项目结构
+
+```bash
 bearing-fault-detection/
 ├── app.py                    # FastAPI后端服务
 ├── data_collection.py        # 数据采集模块
@@ -149,5 +220,6 @@ bearing-fault-detection/
     │   ├── assets/           # 静态资源
     │   └── ...
     └── ...
+```
 
-    
+​    
